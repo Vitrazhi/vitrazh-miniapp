@@ -3,541 +3,565 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Витражи — трекер привычек</title>
+  <title>Витраж — рисовые террасы</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
-      --lead: #1a1528;
-      --ruby: #c41e3a;
-      --sapphire: #1565c0;
-      --emerald: #00897b;
-      --amber: #f9a825;
-      --amethyst: #7b1fa2;
-      --glass-tint: rgba(18, 22, 42, 0.78);
+      --bg-start: #060812;
+      --bg-end: #1a082c;
+      --lead-dark: rgba(0, 0, 0, 0.92);
+      --lead-hi: rgba(255, 255, 255, 0.12);
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body {
+    * { box-sizing: border-box; }
+    body {
       margin: 0;
-      min-height: 100%;
-      min-height: 100dvh;
+      padding: calc(12px + env(safe-area-inset-top)) env(safe-area-inset-right) calc(16px + env(safe-area-inset-bottom)) env(safe-area-inset-left);
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      color: #e8e6f0;
+      color: #e8e4f0;
+      background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       overflow-x: hidden;
-    }
-    .app-bg {
-      background:
-        radial-gradient(ellipse 120% 80% at 50% -20%, rgba(120, 80, 200, 0.35), transparent 50%),
-        radial-gradient(ellipse 80% 50% at 100% 50%, rgba(40, 60, 180, 0.2), transparent 45%),
-        linear-gradient(165deg, #0d1535 0%, #1a0f3c 45%, #251050 100%);
       position: relative;
     }
-    .app-bg::before {
+    body::before {
       content: "";
       position: fixed;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.06'/%3E%3C/svg%3E");
       pointer-events: none;
       z-index: 0;
     }
-    .content-layer { position: relative; z-index: 1; }
-    .vitrail-wrap {
-      filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.45));
-      max-width: min(100%, 420px);
-      margin: 0 auto;
+    h1 {
+      font-size: clamp(1.1rem, 4vw, 1.45rem);
+      font-weight: 600;
+      margin: 0 0 6px;
+      text-align: center;
+      z-index: 1;
     }
-    .shard-poly {
-      cursor: pointer;
-      stroke: var(--lead);
-      stroke-width: 2.5;
-      stroke-linejoin: miter;
-      vector-effect: non-scaling-stroke;
-      transition: filter 0.35s ease;
-      transform-origin: center;
-      transform-box: fill-box;
+    .sub {
+      color: #9b94ab;
+      font-size: 0.85rem;
+      text-align: center;
+      max-width: 34rem;
+      margin: 0 12px 14px;
+      line-height: 1.45;
+      z-index: 1;
     }
-    .shard-poly:not(.filled) { fill: var(--glass-tint); filter: none; }
-    .shard-poly.filled {
-      filter: url(#shardGlow);
-      animation: shardPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    #wrap {
+      position: relative;
+      width: min(92vw, 720px);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.06);
+      background: #000;
+      z-index: 1;
     }
-    @keyframes shardPop {
-      0% { transform: scale(0.82); opacity: 0.65; }
-      60% { transform: scale(1.04); opacity: 1; }
-      100% { transform: scale(1); opacity: 1; }
+    #glass {
+      display: block;
+      width: 100%;
+      height: auto;
+      vertical-align: middle;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
     }
-    .shard-hit { fill: transparent; cursor: pointer; }
-    .progress-bar-fill { transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-    .celebration-layer {
-      pointer-events: none;
+    .bar-wrap {
+      width: min(92vw, 720px);
+      margin-top: 16px;
+      z-index: 1;
+    }
+    .bar-track {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #5b21b6, #06b6d4, #22c55e);
+      transition: width 0.45s ease-out;
+    }
+    .stats {
+      margin: 8px 0 0;
+      font-size: 0.8rem;
+      color: #c4bdd4;
+      text-align: center;
+    }
+    #loading {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #a89bc4;
+      text-align: center;
+      z-index: 1;
+    }
+    .file-row {
+      margin-top: 10px;
+      z-index: 1;
+      font-size: 0.8rem;
+      color: #9b94ab;
+    }
+    .file-row input { margin-top: 6px; max-width: min(92vw, 720px); }
+    #celebration {
       position: fixed;
       inset: 0;
-      z-index: 50;
+      pointer-events: none;
       overflow: hidden;
+      z-index: 1000;
     }
-    .spark {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      animation: sparkFly 1.2s ease-out forwards;
-    }
-    @keyframes sparkFly {
-      0% { transform: translate(0, 0) scale(1); opacity: 1; }
-      100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
-    }
-    .confetti-bit {
+    .confetti-piece {
       position: absolute;
       width: 8px;
-      height: 12px;
-      animation: confettiFall 2.5s linear forwards;
+      height: 8px;
+      opacity: 0;
+      animation: confettiFall var(--dur, 3.5s) ease-out forwards;
     }
     @keyframes confettiFall {
-      0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(100vh) rotate(720deg); opacity: 0.25; }
+      0% {
+        transform: translate(var(--sx), var(--sy)) rotate(0deg) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--ex), var(--ey)) rotate(540deg) scale(0.4);
+        opacity: 0;
+      }
     }
-    .mini-vitrail {
-      width: 56px;
-      height: 72px;
-      border-radius: 8px;
-      border: 2px solid var(--lead);
-      overflow: hidden;
-      background: rgba(0, 0, 0, 0.35);
-    }
-    .achievement-card {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      backdrop-filter: blur(8px);
-    }
-    select.goal-select {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      color: #fff;
-      padding: 8px 12px;
-      font-size: 14px;
-      width: 100%;
-      max-width: 280px;
-    }
-    select.goal-select option { background: #1a1530; color: #fff; }
   </style>
 </head>
-<body class="app-bg min-h-screen">
-  <div class="content-layer flex flex-col min-h-screen px-3 pb-8 pt-[max(12px,env(safe-area-inset-top))]">
-    <header class="text-center pt-2 pb-3">
-      <div class="flex items-center justify-center gap-2 mb-1">
-        <span class="text-2xl" id="goalEmoji" aria-hidden="true">🌙</span>
-        <h1 class="text-xl font-semibold tracking-tight" id="goalTitle">Наладить сон</h1>
-      </div>
-      <p class="text-sm text-white/60">Касайся осколков — собери витраж привычки</p>
-    </header>
-
-    <div class="vitrail-wrap flex-1 flex items-center justify-center py-2">
-      <svg id="vitrailSvg" viewBox="0 0 360 480" class="w-full h-auto max-h-[min(58vh,520px)]" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <filter id="shardGlow" x="-80%" y="-80%" width="260%" height="260%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="b" />
-            <feColorMatrix in="b" type="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.9 0" result="glow" />
-            <feMerge>
-              <feMergeNode in="glow" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-          <g id="sketch-sleep" fill="none" stroke="rgba(200,210,255,0.5)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M40 95 Q55 78 78 88 Q95 72 118 82 Q132 70 155 80" />
-            <path d="M200 68 Q218 55 242 62 Q262 52 288 58 Q305 48 328 55" />
-            <path d="M52 118 L58 112 L64 118 L58 124 Z M88 105 L92 100 L96 105 L92 110 Z M125 92 L130 86 L135 92 L130 98 Z M280 95 L285 89 L290 95 L285 101 Z M310 125 L315 119 L320 125 L315 131 Z" />
-            <circle cx="285" cy="108" r="38" />
-            <path d="M285 70 A38 38 0 0 1 285 146 A28 28 0 0 1 285 88 Z" fill="rgba(200,210,255,0.08)" stroke="rgba(200,210,255,0.55)" />
-            <rect x="55" y="295" rx="6" width="250" height="95" />
-            <path d="M55 295 L55 250 Q55 235 72 235 L288 235 Q305 235 305 250 L305 295" />
-            <line x1="180" y1="235" x2="180" y2="295" />
-            <path d="M72 390 L288 390" stroke-width="2" />
-            <path d="M95 355 Q120 340 145 355 T195 355 T245 355" opacity="0.75" />
-          </g>
-          <g id="sketch-sport" fill="none" stroke="rgba(200,230,255,0.5)" stroke-width="1.6" stroke-linecap="round">
-            <path d="M60 120 L300 120" />
-            <path d="M90 120 L90 200 M270 120 L270 200" />
-            <rect x="115" y="165" width="130" height="18" rx="4" />
-            <circle cx="180" cy="174" r="22" />
-            <path d="M100 320 Q180 280 260 320" />
-            <path d="M120 340 L160 300 L200 340 L240 300 L280 340" stroke-width="2" />
-            <path d="M70 400 Q100 380 130 400 T190 400 T250 400" />
-          </g>
-          <g id="sketch-nutrition" fill="none" stroke="rgba(220,255,210,0.5)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <ellipse cx="175" cy="200" rx="55" ry="48" transform="rotate(-12 175 200)" />
-            <path d="M175 152 Q195 130 215 155 Q205 175 175 168" />
-            <path d="M240 165 Q255 140 275 155 Q268 185 245 178" />
-            <ellipse cx="255" cy="330" rx="70" ry="22" />
-            <path d="M185 318 L325 318 Q335 318 335 330 Q335 342 325 342 L185 342 Q175 342 175 330 Q175 318 185 318" />
-            <path d="M95 305 Q110 285 128 302" />
-            <circle cx="310" cy="95" r="4" fill="rgba(255,220,150,0.45)" stroke="none" />
-            <path d="M295 115 L318 108 L305 130 Z" fill="rgba(255,220,150,0.2)" stroke="rgba(220,255,210,0.5)" />
-          </g>
-          <g id="sketch-meditation" fill="none" stroke="rgba(230,210,255,0.5)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="180" cy="200" r="72" />
-            <circle cx="180" cy="200" r="58" stroke-dasharray="6 10" opacity="0.6" />
-            <path d="M180 118 L180 95 M180 282 L180 305 M108 200 L85 200 M252 200 L275 200" opacity="0.5" />
-            <path d="M180 175 Q165 188 168 205 Q172 228 180 242 Q188 228 192 205 Q195 188 180 175" fill="rgba(230,210,255,0.06)" />
-            <ellipse cx="180" cy="268" rx="42" ry="14" />
-            <path d="M150 268 Q180 250 210 268" />
-          </g>
-        </defs>
-        <g id="sketchLayer"></g>
-        <g id="shardsLayer"></g>
-      </svg>
-    </div>
-
-    <div class="mt-2 space-y-3">
-      <div class="text-center">
-        <p class="text-sm text-white/70 mb-1">Прогресс витража</p>
-        <p class="text-2xl font-bold tabular-nums" id="progressText">0 / 24</p>
-        <div class="h-2 rounded-full bg-black/30 overflow-hidden max-w-xs mx-auto mt-2">
-          <div id="progressBar" class="progress-bar-fill h-full rounded-full bg-gradient-to-r from-violet-500 to-amber-400" style="width: 0%"></div>
-        </div>
-      </div>
-      <div class="flex flex-col items-center gap-2">
-        <label class="text-xs text-white/50" for="goalSelect">Цель</label>
-        <select id="goalSelect" class="goal-select" aria-label="Выбор цели">
-          <option value="sleep">Наладить сон</option>
-          <option value="sport">Спорт и движение</option>
-          <option value="nutrition">Питание</option>
-          <option value="meditation">Медитация</option>
-        </select>
-        <button type="button" id="btnNewHabit" class="mt-1 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-sm font-medium border border-white/20 transition-colors">
-          + Новая привычка (сменить цель)
-        </button>
-      </div>
-      <section class="mt-4">
-        <div class="flex items-center justify-between mb-2 px-1">
-          <h2 class="text-sm font-semibold text-white/90">Мои витражи</h2>
-          <span class="text-xs text-amber-200/90" id="totalMastered">Всего освоено: 0</span>
-        </div>
-        <div class="h-1.5 rounded-full bg-black/25 overflow-hidden mb-3">
-          <div id="totalBarFill" class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 progress-bar-fill" style="width: 0%"></div>
-        </div>
-        <div id="collectionGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-2"></div>
-        <p id="collectionEmpty" class="text-center text-sm text-white/40 py-6">Пока нет собранных витражей — закрасьте все 24 осколка!</p>
-      </section>
-    </div>
+<body>
+  <h1>Витраж «Рисовые террасы»</h1>
+  <p class="sub">Сначала — свинцовая сетка и едва заметный силуэт; по клику каждый осколок открывает фрагмент снимка в стиле витража.</p>
+  <div id="wrap">
+    <canvas id="glass"></canvas>
   </div>
-  <div id="celebration" class="celebration-layer" aria-hidden="true"></div>
+  <div class="bar-wrap">
+    <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+    <p class="stats" id="stats">0 / 0</p>
+  </div>
+  <p id="loading">Загрузка…</p>
+  <label class="file-row">
+    Свой файл (если нет <code>assets/vitrazh-rice.png</code>):
+    <input type="file" id="pickImage" accept="image/png,image/jpeg,image/webp" />
+  </label>
+  <div id="celebration" aria-hidden="true"></div>
 
-  <script>
-(function () {
-  /* Cloud Storage (Telegram): при желании допишите tg.CloudStorage.setItem / getItem вместо только localStorage */
-  const STORAGE_KEYS = { progress: "vitrazh_progress_v1", completed: "vitrazh_completed_v1", currentGoal: "vitrazh_current_goal_v1" };
+  <script type="module">
+    import { Delaunay } from "https://cdn.jsdelivr.net/npm/d3-delaunay@6/+esm";
 
-  const GOALS = {
-    sleep: { id: "sleep", title: "Наладить сон", emoji: "🌙", sketchId: "sketch-sleep" },
-    sport: { id: "sport", title: "Спорт и движение", emoji: "🏃", sketchId: "sketch-sport" },
-    nutrition: { id: "nutrition", title: "Питание", emoji: "🥗", sketchId: "sketch-nutrition" },
-    meditation: { id: "meditation", title: "Медитация", emoji: "🧘", sketchId: "sketch-meditation" },
-  };
+    const IMAGE_SOURCE = "assets/vitrazh-rice.png";
 
-  const STAINED_HEX = ["#c41e3a", "#1565c0", "#00897b", "#f9a825", "#7b1fa2"];
-  const STAINED_PALETTE = ["var(--ruby)", "var(--sapphire)", "var(--emerald)", "var(--amber)", "var(--amethyst)"];
+    const V_MIN = 20;
+    const V_MAX = 30;
+    const LEAD_PX = 3;
+    const FAINT_OPACITY = 0.1;
+    const MASK_RGB = "6, 8, 18";
+    const MASK_A = 0.94;
+    const STORAGE = "vitrazh_voro_";
 
-  const GRID_PTS = [
-    [[0, 0], [93, 0], [181, 2], [271, 0], [360, 0]],
-    [[0, 78], [91, 82], [183, 76], [270, 81], [360, 78]],
-    [[0, 156], [89, 152], [185, 159], [272, 154], [360, 156]],
-    [[0, 234], [92, 238], [182, 231], [269, 235], [360, 234]],
-    [[0, 312], [88, 308], [184, 315], [268, 311], [360, 312]],
-    [[0, 390], [90, 394], [181, 388], [271, 391], [360, 390]],
-    [[0, 480], [92, 480], [180, 480], [268, 480], [360, 480]],
-  ];
-
-  function cellPolygon(c, r) {
-    var p00 = GRID_PTS[r][c], p10 = GRID_PTS[r][c + 1], p11 = GRID_PTS[r + 1][c + 1], p01 = GRID_PTS[r + 1][c];
-    return [p00, p10, p11, p01].map(function (p) { return p.join(","); }).join(" ");
-  }
-
-  var MINI_SKETCH = {
-    sleep: '<g fill="none" stroke="rgba(200,210,255,0.45)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" transform="translate(0,10) scale(1)"><path d="M40 95 Q78 82 155 80"/><path d="M200 68 Q255 55 328 55"/><path d="M52 118 L58 112 L64 118 Z M310 125 L320 125 L315 131 Z"/><circle cx="285" cy="108" r="38"/><rect x="55" y="295" rx="6" width="250" height="95"/><path d="M55 295 L55 250 Q72 235 288 235 Q305 235 305 250 L305 295"/><line x1="180" y1="235" x2="180" y2="295"/></g>',
-    sport: '<g fill="none" stroke="rgba(200,230,255,0.45)" stroke-width="6" stroke-linecap="round"><path d="M60 120 L300 120"/><path d="M90 120 L90 200 M270 120 L270 200"/><rect x="115" y="165" width="130" height="18" rx="4"/><circle cx="180" cy="174" r="22"/><path d="M120 340 L160 300 L200 340 L240 300 L280 340"/></g>',
-    nutrition: '<g fill="none" stroke="rgba(220,255,210,0.45)" stroke-width="6" stroke-linecap="round"><ellipse cx="175" cy="200" rx="55" ry="48" transform="rotate(-12 175 200)"/><ellipse cx="255" cy="330" rx="70" ry="22"/><path d="M185 318 L325 318 Q335 330 325 342 L185 342 Q175 330 185 318"/></g>',
-    meditation: '<g fill="none" stroke="rgba(230,210,255,0.45)" stroke-width="6" stroke-linecap="round"><circle cx="180" cy="200" r="72"/><path d="M180 175 Q168 205 180 242 Q192 205 180 175"/><ellipse cx="180" cy="268" rx="42" ry="14"/></g>',
-  };
-
-  var tg = window.Telegram && window.Telegram.WebApp;
-  if (tg) { try { tg.ready(); tg.expand(); } catch (e) {} }
-
-  function loadJSON(key, fb) {
-    try { var r = localStorage.getItem(key); return r ? JSON.parse(r) : fb; } catch (e) { return fb; }
-  }
-  function saveJSON(key, v) { localStorage.setItem(key, JSON.stringify(v)); }
-
-  var state = {
-    currentGoalId: loadJSON(STORAGE_KEYS.currentGoal, "sleep") || "sleep",
-    progressByGoal: loadJSON(STORAGE_KEYS.progress, {}),
-    completed: loadJSON(STORAGE_KEYS.completed, []),
-  };
-
-  function getProgressBits(gid) {
-    var arr = state.progressByGoal[gid];
-    if (!Array.isArray(arr)) return new Array(24).fill(0);
-    return arr.slice(0, 24).concat(new Array(Math.max(0, 24 - arr.length)).fill(0)).slice(0, 24);
-  }
-  function setProgressBits(gid, bits) { state.progressByGoal[gid] = bits; saveJSON(STORAGE_KEYS.progress, state.progressByGoal); }
-  function saveCompleted() { saveJSON(STORAGE_KEYS.completed, state.completed); }
-
-  var svg = document.getElementById("vitrailSvg");
-  var shardsLayer = document.getElementById("shardsLayer");
-  var sketchLayer = document.getElementById("sketchLayer");
-  var goalTitle = document.getElementById("goalTitle");
-  var goalEmoji = document.getElementById("goalEmoji");
-  var goalSelect = document.getElementById("goalSelect");
-  var progressText = document.getElementById("progressText");
-  var progressBar = document.getElementById("progressBar");
-  var collectionGrid = document.getElementById("collectionGrid");
-  var collectionEmpty = document.getElementById("collectionEmpty");
-  var totalMastered = document.getElementById("totalMastered");
-  var totalBarFill = document.getElementById("totalBarFill");
-  var celebration = document.getElementById("celebration");
-
-  var audioCtx = null;
-  function playChime() {
-    try {
-      var Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!Ctx) return;
-      if (!audioCtx) audioCtx = new Ctx();
-      if (audioCtx.state === "suspended") audioCtx.resume();
-      var o = audioCtx.createOscillator(), g = audioCtx.createGain();
-      o.type = "sine";
-      o.frequency.value = 587.33;
-      o.connect(g);
-      g.connect(audioCtx.destination);
-      g.gain.setValueAtTime(0.065, audioCtx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
-      o.start(audioCtx.currentTime);
-      o.stop(audioCtx.currentTime + 0.2);
-    } catch (e) {}
-  }
-
-  function hashShardIndex(i) {
-    return ((i * 17 + 31) % STAINED_PALETTE.length + STAINED_PALETTE.length) % STAINED_PALETTE.length;
-  }
-
-  function buildDefsClips() {
-    var defs = svg.querySelector("defs");
-    for (var i = 0; i < 24; i++) {
-      var clip = document.createElementNS("http://www.w3.org/2000/svg", "clipPath");
-      clip.setAttribute("id", "clip-shard-" + i);
-      var poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-      poly.setAttribute("points", cellPolygon(i % 4, Math.floor(i / 4)));
-      clip.appendChild(poly);
-      defs.appendChild(clip);
+    const tg = typeof Telegram !== "undefined" && Telegram.WebApp ? Telegram.WebApp : null;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      const c = tg.themeParams?.bg_color;
+      if (c) {
+        document.documentElement.style.setProperty("--bg-start", c);
+        document.documentElement.style.setProperty("--bg-end", c);
+        try {
+          tg.setHeaderColor(c);
+          tg.setBackgroundColor(c);
+        } catch (_) {}
+      }
     }
-  }
 
-  function renderSketchBehind(goal) {
-    sketchLayer.innerHTML = "";
-    var use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-    use.setAttribute("href", "#" + goal.sketchId);
-    sketchLayer.appendChild(use);
-  }
+    const glassCanvas = document.getElementById("glass");
+    const ctx = glassCanvas.getContext("2d");
+    const barFillEl = document.getElementById("barFill");
+    const statsEl = document.getElementById("stats");
+    const loadingEl = document.getElementById("loading");
+    const celebrationEl = document.getElementById("celebration");
+    const wrapEl = document.getElementById("wrap");
+    const pickImage = document.getElementById("pickImage");
 
-  function renderShards() {
-    shardsLayer.innerHTML = "";
-    var goal = GOALS[state.currentGoalId];
-    var bits = getProgressBits(state.currentGoalId);
-    for (var i = 0; i < 24; i++) {
-      var c = i % 4, r = Math.floor(i / 4);
-      var points = cellPolygon(c, r);
-      var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      g.setAttribute("class", "shard-group");
-      g.setAttribute("data-index", String(i));
+    let imageSource = IMAGE_SOURCE;
+    let img = null;
+    let imgW = 0;
+    let imgH = 0;
+    let polygons = [];
+    let edges = [];
+    let revealed = [];
+    let sourceHash = "";
+    let keyGeom = "";
+    let keyProg = "";
+    let completionCelebrated = false;
 
-      var sketchFrag = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      sketchFrag.setAttribute("clip-path", "url(#clip-shard-" + i + ")");
-      var useSketch = document.createElementNS("http://www.w3.org/2000/svg", "use");
-      useSketch.setAttribute("href", "#" + goal.sketchId);
-      sketchFrag.appendChild(useSketch);
-
-      var glass = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-      glass.setAttribute("class", "shard-poly" + (bits[i] ? " filled" : ""));
-      glass.setAttribute("points", points);
-      if (bits[i]) glass.style.fill = STAINED_PALETTE[hashShardIndex(i)];
-
-      var hit = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-      hit.setAttribute("class", "shard-hit");
-      hit.setAttribute("points", points);
-      hit.setAttribute("role", "button");
-      hit.setAttribute("tabindex", "0");
-      hit.setAttribute("aria-label", "Осколок " + (i + 1));
-
-      g.appendChild(sketchFrag);
-      g.appendChild(glass);
-      g.appendChild(hit);
-
-      (function (idx) {
-        function activate() { toggleShard(idx); }
-        hit.addEventListener("click", activate);
-        hit.addEventListener("keydown", function (e) {
-          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(); }
-        });
-      })(i);
-
-      shardsLayer.appendChild(g);
+    function hashSource(str) {
+      let h = 0;
+      for (let i = 0; i < str.length; i++) {
+        h = (h << 5) - h + str.charCodeAt(i);
+        h |= 0;
+      }
+      return Math.abs(h).toString(16);
     }
-  }
 
-  function countFilled(bits) { return bits.reduce(function (a, b) { return a + (b ? 1 : 0); }, 0); }
-
-  function updateProgressUI() {
-    var bits = getProgressBits(state.currentGoalId);
-    var n = countFilled(bits);
-    progressText.textContent = n + " / 24";
-    progressBar.style.width = (n / 24) * 100 + "%";
-  }
-
-  function toggleShard(index) {
-    var gid = state.currentGoalId;
-    var bits = getProgressBits(gid);
-    if (bits[index]) return;
-    bits[index] = 1;
-    setProgressBits(gid, bits);
-    playChime();
-
-    var group = shardsLayer.querySelector('.shard-group[data-index="' + index + '"]');
-    if (group) {
-      var poly = group.querySelector(".shard-poly");
-      poly.classList.add("filled");
-      poly.style.fill = STAINED_PALETTE[hashShardIndex(index)];
+    function mulberry32(a) {
+      return function () {
+        let t = (a += 0x6d2b79f5);
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
     }
-    updateProgressUI();
-    if (countFilled(bits) === 24) onVitrailComplete();
-  }
 
-  function onVitrailComplete() {
-    var g = GOALS[state.currentGoalId];
-    state.completed.push({ goalId: g.id, title: g.title, emoji: g.emoji, date: new Date().toISOString() });
-    saveCompleted();
-    runCelebration();
-    renderCollection();
-    updateTotalBar();
-    setProgressBits(state.currentGoalId, new Array(24).fill(0));
-    setTimeout(function () { renderShards(); updateProgressUI(); }, 450);
-  }
-
-  function runCelebration() {
-    var colors = ["#f9a825", "#7b1fa2", "#1565c0", "#c41e3a", "#00897b", "#ffffff"];
-    var rect = celebration.getBoundingClientRect();
-    var i, sp, cf;
-    for (i = 0; i < 45; i++) {
-      sp = document.createElement("div");
-      sp.className = "spark";
-      sp.style.left = (rect.width / 2 + (Math.random() - 0.5) * 140) + "px";
-      sp.style.top = (rect.height / 2 + (Math.random() - 0.5) * 140) + "px";
-      sp.style.background = colors[i % colors.length];
-      sp.style.setProperty("--tx", (Math.random() - 0.5) * 220 + "px");
-      sp.style.setProperty("--ty", (Math.random() - 0.5) * 220 + "px");
-      celebration.appendChild(sp);
-      (function (el) { setTimeout(function () { el.remove(); }, 1200); })(sp);
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error("load failed"));
+        if (!/^data:/i.test(src)) image.crossOrigin = "anonymous";
+        image.src = src;
+      });
     }
-    for (i = 0; i < 70; i++) {
-      cf = document.createElement("div");
-      cf.className = "confetti-bit";
-      cf.style.left = Math.random() * 100 + "%";
-      cf.style.top = "-24px";
-      cf.style.background = colors[i % colors.length];
-      cf.style.animationDelay = Math.random() * 0.45 + "s";
-      cf.style.animationDuration = 2.1 + Math.random() * 1.6 + "s";
-      celebration.appendChild(cf);
-      (function (el) { setTimeout(function () { el.remove(); }, 4200); })(cf);
-    }
-    if (tg && tg.HapticFeedback) {
-      try { tg.HapticFeedback.notificationOccurred("success"); } catch (e) {}
-    }
-  }
 
-  function formatDate(iso) {
-    try {
-      return new Date(iso).toLocaleDateString("ru-RU", { day: "numeric", month: "short", year: "numeric" });
-    } catch (e) { return ""; }
-  }
-
-  function miniVitrailSVG(goalId) {
-    var g = GOALS[goalId];
-    if (!g) return "";
-    var sketch = MINI_SKETCH[g.id] || "";
-    var polys = "";
-    for (var i = 0; i < 24; i++) {
-      var c = i % 4, r = Math.floor(i / 4);
-      var col = STAINED_HEX[hashShardIndex(i)];
-      polys += '<polygon points="' + cellPolygon(c, r) + '" fill="' + col + '" stroke="#1a1528" stroke-width="1.2"/>';
+    function fallbackImage(w, h) {
+      const c = document.createElement("canvas");
+      c.width = w;
+      c.height = h;
+      const x = c.getContext("2d");
+      const g = x.createLinearGradient(0, 0, w, h);
+      g.addColorStop(0, "#1e3a2f");
+      g.addColorStop(0.5, "#3d2c1e");
+      g.addColorStop(1, "#87ceeb");
+      x.fillStyle = g;
+      x.fillRect(0, 0, w, h);
+      x.strokeStyle = "rgba(0,0,0,0.35)";
+      x.lineWidth = 3;
+      for (let i = 0; i < 12; i++) {
+        x.beginPath();
+        x.arc(w * 0.52, h * 0.48, 40 + i * 28, 0, Math.PI * 2);
+        x.stroke();
+      }
+      x.fillStyle = "rgba(255,255,255,0.25)";
+      x.font = `${Math.round(h * 0.04)}px sans-serif`;
+      x.textAlign = "center";
+      x.fillText("Укажите assets/vitrazh-rice.png или выберите файл ниже", w / 2, h / 2);
+      return c;
     }
-    return '<svg viewBox="0 0 360 480" xmlns="http://www.w3.org/2000/svg">' +
-      sketch + polys + "</svg>";
-  }
 
-  function renderCollection() {
-    collectionGrid.innerHTML = "";
-    var list = state.completed.slice().reverse();
-    collectionEmpty.style.display = list.length ? "none" : "block";
-    list.forEach(function (item) {
-      var card = document.createElement("div");
-      card.className = "achievement-card p-2 flex flex-col items-center gap-1";
-      var mini = document.createElement("div");
-      mini.className = "mini-vitrail";
-      mini.innerHTML = miniVitrailSVG(item.goalId);
-      var icon = document.createElement("span");
-      icon.className = "text-lg";
-      icon.textContent = item.emoji || "✨";
-      var title = document.createElement("p");
-      title.className = "text-[10px] text-white/80 text-center leading-tight line-clamp-2";
-      title.textContent = item.title;
-      var date = document.createElement("p");
-      date.className = "text-[9px] text-white/45";
-      date.textContent = formatDate(item.date);
-      card.appendChild(mini);
-      card.appendChild(icon);
-      card.appendChild(title);
-      card.appendChild(date);
-      collectionGrid.appendChild(card);
+    function cellCountFromSeed(seedHex) {
+      const seed = parseInt(seedHex.slice(-6) || "1", 16) || 1;
+      const r = mulberry32(seed);
+      return Math.floor(r() * (V_MAX - V_MIN + 1)) + V_MIN;
+    }
+
+    function generateSites(width, height, count, rand) {
+      const sites = [];
+      const pad = LEAD_PX * 3;
+      const col = Math.ceil(Math.sqrt(count));
+      const cw = (width - 2 * pad) / col;
+      const ch = (height - 2 * pad) / Math.ceil(count / col);
+      for (let i = 0; i < count; i++) {
+        const cc = i % col;
+        const cr = Math.floor(i / col);
+        const x = pad + cw * (cc + 0.5 + (rand() - 0.5) * 0.85);
+        const y = pad + ch * (cr + 0.5 + (rand() - 0.5) * 0.85);
+        sites.push([
+          Math.max(pad, Math.min(width - pad, x)),
+          Math.max(pad, Math.min(height - pad, y)),
+        ]);
+      }
+      return sites;
+    }
+
+    function lloydRelax(sites, width, height, iterations) {
+      let s = sites.map((p) => [p[0], p[1]]);
+      for (let it = 0; it < iterations; it++) {
+        const delaunay = Delaunay.from(s);
+        const voronoi = delaunay.voronoi([0, 0, width, height]);
+        const next = [];
+        for (let j = 0; j < s.length; j++) {
+          const poly = voronoi.cellPolygon(j);
+          if (!poly || poly.length < 3) {
+            next.push(s[j]);
+            continue;
+          }
+          let a = 0;
+          let cx = 0;
+          let cy = 0;
+          for (let k = 0; k < poly.length; k++) {
+            const p1 = poly[k];
+            const p2 = poly[(k + 1) % poly.length];
+            const cr = p1[0] * p2[1] - p2[0] * p1[1];
+            a += cr;
+            cx += (p1[0] + p2[0]) * cr;
+            cy += (p1[1] + p2[1]) * cr;
+          }
+          a *= 0.5;
+          if (Math.abs(a) < 1e-6) next.push(s[j]);
+          else next.push([cx / (6 * a), cy / (6 * a)]);
+        }
+        s = next;
+      }
+      return s;
+    }
+
+    function cellPolygonsFromSites(sites, width, height) {
+      const delaunay = Delaunay.from(sites);
+      const voronoi = delaunay.voronoi([0, 0, width, height]);
+      return Array.from(voronoi.cellPolygons(), (p) => Array.from(p));
+    }
+
+    function edgeKey(p1, p2) {
+      const [x1, y1] = p1;
+      const [x2, y2] = p2;
+      return x1 < x2 || (x1 === x2 && y1 < y2)
+        ? `${x1},${y1}|${x2},${y2}`
+        : `${x2},${y2}|${x1},${y1}`;
+    }
+
+    function uniqueEdges(polys) {
+      const m = new Map();
+      for (const poly of polys) {
+        for (let i = 0; i < poly.length; i++) {
+          const a = poly[i];
+          const b = poly[(i + 1) % poly.length];
+          m.set(edgeKey(a, b), { p1: a, p2: b });
+        }
+      }
+      return Array.from(m.values());
+    }
+
+    function pointInPolygon(pt, poly) {
+      const [x, y] = pt;
+      let inside = false;
+      for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        const xi = poly[i][0];
+        const yi = poly[i][1];
+        const xj = poly[j][0];
+        const yj = poly[j][1];
+        const inter = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi + 1e-12) + xi;
+        if (inter) inside = !inside;
+      }
+      return inside;
+    }
+
+    function findCell(clientX, clientY) {
+      const rect = glassCanvas.getBoundingClientRect();
+      const sx = (clientX - rect.left) * (glassCanvas.width / rect.width);
+      const sy = (clientY - rect.top) * (glassCanvas.height / rect.height);
+      for (let i = polygons.length - 1; i >= 0; i--) {
+        if (pointInPolygon([sx, sy], polygons[i])) return i;
+      }
+      return -1;
+    }
+
+    function confettiBurst() {
+      const colors = [
+        "#ef4444", "#f97316", "#eab308", "#22c55e", "#06b6d4",
+        "#3b82f6", "#8b5cf6", "#d946ef", "#f43f5e",
+      ];
+      celebrationEl.innerHTML = "";
+      for (let i = 0; i < 90; i++) {
+        const el = document.createElement("div");
+        el.className = "confetti-piece";
+        el.style.background = colors[i % colors.length];
+        const x0 = Math.random() * window.innerWidth;
+        const y0 = -20 - Math.random() * 80;
+        el.style.setProperty("--sx", `${x0}px`);
+        el.style.setProperty("--sy", `${y0}px`);
+        el.style.setProperty("--ex", `${x0 + (Math.random() - 0.5) * 200}px`);
+        el.style.setProperty("--ey", `${window.innerHeight + 40}px`);
+        el.style.setProperty("--dur", `${2.8 + Math.random() * 2}s`);
+        celebrationEl.appendChild(el);
+      }
+    }
+
+    function loadProgress(total) {
+      try {
+        const raw = localStorage.getItem(keyProg);
+        if (!raw) return new Array(total).fill(false);
+        const p = JSON.parse(raw);
+        if (p.hash === sourceHash && Array.isArray(p.revealed) && p.revealed.length === total)
+          return p.revealed;
+      } catch (_) {}
+      return new Array(total).fill(false);
+    }
+
+    function saveProgress() {
+      localStorage.setItem(keyProg, JSON.stringify({ hash: sourceHash, revealed }));
+    }
+
+    function resizeCanvas() {
+      const w = wrapEl.clientWidth;
+      if (!imgW || !imgH) return;
+      const dispH = Math.round(imgH * (w / imgW));
+      glassCanvas.style.width = "100%";
+      glassCanvas.style.height = dispH + "px";
+      glassCanvas.width = imgW;
+      glassCanvas.height = imgH;
+    }
+
+    function draw() {
+      const W = glassCanvas.width;
+      const H = glassCanvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      ctx.save();
+      ctx.globalAlpha = FAINT_OPACITY;
+      ctx.drawImage(img, 0, 0, W, H);
+      ctx.restore();
+
+      polygons.forEach((poly, i) => {
+        if (!revealed[i]) return;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(poly[0][0], poly[0][1]);
+        for (let j = 1; j < poly.length; j++) ctx.lineTo(poly[j][0], poly[j][1]);
+        ctx.closePath();
+        ctx.clip();
+        ctx.filter = "saturate(1.85) contrast(1.12) brightness(1.06)";
+        ctx.shadowColor = "rgba(120, 200, 255, 0.45)";
+        ctx.shadowBlur = 18;
+        ctx.drawImage(img, 0, 0, W, H);
+        ctx.restore();
+      });
+
+      polygons.forEach((poly, i) => {
+        if (revealed[i]) return;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(poly[0][0], poly[0][1]);
+        for (let j = 1; j < poly.length; j++) ctx.lineTo(poly[j][0], poly[j][1]);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(${MASK_RGB}, ${MASK_A})`;
+        ctx.fill();
+        ctx.restore();
+      });
+
+      edges.forEach(({ p1, p2 }) => {
+        ctx.beginPath();
+        ctx.moveTo(p1[0], p1[1]);
+        ctx.lineTo(p2[0], p2[1]);
+        ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--lead-dark").trim() || "rgba(0,0,0,0.92)";
+        ctx.lineWidth = LEAD_PX;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.stroke();
+        ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--lead-hi").trim() || "rgba(255,255,255,0.12)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+    }
+
+    function updateUI() {
+      const total = polygons.length;
+      const n = revealed.filter(Boolean).length;
+      barFillEl.style.width = total ? `${(n / total) * 100}%` : "0%";
+      statsEl.textContent = `${n} / ${total}`;
+      loadingEl.textContent = "";
+
+      if (total && n === total) {
+        if (!completionCelebrated) {
+          completionCelebrated = true;
+          if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+          confettiBurst();
+        }
+      } else completionCelebrated = false;
+    }
+
+    function onTap(clientX, clientY) {
+      const idx = findCell(clientX, clientY);
+      if (idx < 0 || revealed[idx]) return;
+      revealed[idx] = true;
+      saveProgress();
+      draw();
+      updateUI();
+      if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
+    }
+
+    glassCanvas.addEventListener("click", (e) => onTap(e.clientX, e.clientY));
+    glassCanvas.addEventListener(
+      "touchend",
+      (e) => {
+        e.preventDefault();
+        const t = e.changedTouches[0];
+        onTap(t.clientX, t.clientY);
+      },
+      { passive: false }
+    );
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      draw();
     });
-  }
 
-  function updateTotalBar() {
-    var n = state.completed.length;
-    totalMastered.textContent = "Всего освоено: " + n;
-    totalBarFill.style.width = Math.min(100, n * 8) + "%";
-  }
+    async function buildFromCurrentSource() {
+      loadingEl.textContent = "Загрузка изображения…";
+      sourceHash = hashSource(imageSource);
+      keyGeom = STORAGE + "geom_" + sourceHash;
+      keyProg = STORAGE + "prog_" + sourceHash;
 
-  function applyGoalUI() {
-    var g = GOALS[state.currentGoalId];
-    goalTitle.textContent = g.title;
-    goalEmoji.textContent = g.emoji;
-    goalSelect.value = state.currentGoalId;
-    renderSketchBehind(g);
-    renderShards();
-    updateProgressUI();
-  }
+      try {
+        img = await loadImage(imageSource);
+      } catch (e) {
+        console.warn(e);
+        loadingEl.textContent = "Файл по умолчанию не найден — выберите PNG/JPG ниже или положите assets/vitrazh-rice.png";
+        img = fallbackImage(900, 675);
+      }
 
-  function switchGoal(newId) {
-    if (!GOALS[newId]) return;
-    state.currentGoalId = newId;
-    saveJSON(STORAGE_KEYS.currentGoal, newId);
-    applyGoalUI();
-  }
+      imgW = img.naturalWidth || img.width;
+      imgH = img.naturalHeight || img.height;
+      const targetN = cellCountFromSeed(sourceHash);
 
-  goalSelect.addEventListener("change", function () { switchGoal(goalSelect.value); });
+      let sites = null;
+      try {
+        const g = localStorage.getItem(keyGeom);
+        if (g) {
+          const parsed = JSON.parse(g);
+          if (parsed.hash === sourceHash && Array.isArray(parsed.sites) && parsed.sites.length >= V_MIN && parsed.sites.length <= V_MAX)
+            sites = parsed.sites;
+        }
+      } catch (_) {}
 
-  document.getElementById("btnNewHabit").addEventListener("click", function () {
-    var opts = ["sleep", "sport", "nutrition", "meditation"];
-    var cur = opts.indexOf(state.currentGoalId);
-    goalSelect.value = opts[(cur + 1) % opts.length];
-    switchGoal(goalSelect.value);
-  });
+      if (!sites) {
+        loadingEl.textContent = "Раскладка витража…";
+        const seed = parseInt(sourceHash.slice(0, 8) || "1", 16) || 1;
+        sites = generateSites(imgW, imgH, targetN, mulberry32(seed));
+        sites = lloydRelax(sites, imgW, imgH, 6);
+        localStorage.setItem(keyGeom, JSON.stringify({ hash: sourceHash, sites }));
+      }
 
-  buildDefsClips();
-  applyGoalUI();
-  renderCollection();
-  updateTotalBar();
-})();
+      polygons = cellPolygonsFromSites(sites, imgW, imgH);
+      edges = uniqueEdges(polygons);
+      revealed = loadProgress(polygons.length);
+      saveProgress();
+
+      completionCelebrated = revealed.filter(Boolean).length === polygons.length;
+
+      resizeCanvas();
+      draw();
+      updateUI();
+    }
+
+    pickImage.addEventListener("change", (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      imageSource = URL.createObjectURL(f);
+      buildFromCurrentSource().catch((err) => {
+        loadingEl.textContent = "Ошибка: " + (err && err.message);
+        console.error(err);
+      });
+    });
+
+    buildFromCurrentSource().catch((e) => {
+      loadingEl.textContent = "Ошибка: " + (e && e.message);
+      console.error(e);
+    });
   </script>
 </body>
 </html>
